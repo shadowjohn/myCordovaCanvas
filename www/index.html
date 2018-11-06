@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>        
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">        
+        <title>Hello World</title>
+        <style>
+        html,body{
+          padding:0px;
+          margin:0px;
+          overflow:hidden;
+        }
+        #canvas{
+          border:1px solid #f00;
+        }
+        #restart{
+          position:absolute;
+          right:0px;
+          bottom:0px;
+          font-size:16px;
+        }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <input type="button" id="restart" value="Reset">
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/php.js"></script>
+        <script type="text/javascript" src="js/include.js"></script>                
+        <script langauge="javascript">
+          var canvas,ctx;
+          var img;
+          var w,h;
+          var X=0,Y=0;
+          var brush=0;
+          function DrawBoardPressDown(event)  
+          {            
+            console.log("PressDown");
+            X  =  event.originalEvent.touches[0].screenX;  //  +document.body.scrollLeft
+            Y  =  event.originalEvent.touches[0].screenY; 
+            brush=1;
+            ctx.beginPath();
+            ctx.moveTo(x,y);      
+            console.log(x+","+y);                        
+          }  
+      		function DrawBoardPressUp(event)  
+          {   
+            console.log("PressUp");
+            if(brush==1)
+            {
+              ctx.closePath();
+            }       
+            brush=0;                  
+          }
+          function DrawBoardMove(event)
+      		{
+            console.log("PressMove");
+            //console.log(event);
+      		  var x,y;
+            x  =  event.originalEvent.touches[0].pageX*3/5;  //  +document.body.scrollLeft
+            y  =  event.originalEvent.touches[0].pageY*3/5;  //  +document.body.scrollTop      
+            X=x;
+            Y=y;
+            //console.log(x+","+y);
+            console.log(print_r(event.originalEvent.touches[0],true));      
+            if(brush==1)
+            {              
+              ctx.lineTo(x,y);                    
+              ctx.stroke();                  
+              ctx.closePath();                   
+              ctx.beginPath();                  
+              ctx.moveTo(x,y);                                               
+            }
+          }                             
+          $(document).ready(function(){
+            $("#restart").click(function(){
+              location.reload();
+            });
+            w = $(window).width()*80/100;
+            h = $(window).height()*80/100;
+            $("#canvas").width( w );
+            $("#canvas").height( h );
+            
+            canvas = $("#canvas")[0];          
+            ctx=canvas.getContext('2d');
+            ctx.mozImageSmoothingEnabled = true;
+            ctx.fillStyle = "#000";            
+            ctx.fillRect(0,0, w,h);
+            ctx.lineWidth=5;
+            ctx.strokeStyle="#F00";
+            img = new Image();
+            img.onload = function(){                       
+              ctx.drawImage(img,0,0,img.width,img.height,0,0,w*2/3,h*2/3);
+            }
+            img.src = "img/nsr.jpg";
+            $("#canvas").bind("touchstart",function(e){
+              //alert(e.X);              
+              DrawBoardPressDown(e);
+            });
+            $("#canvas").bind("touchend",function(e){
+              DrawBoardPressUp(e);
+            });
+            $("#canvas").bind("touchmove",function(e){
+              //console.log(print_r(e.originalEvent,true));
+              //alert('gg');      
+              DrawBoardMove(e);
+            });
+            $("#canvas").bind("touchcancel",function(e){
+              DrawBoardPressUp(e);
+            });
+          });
+        </script>        
+    </body>
+</html>
